@@ -19,6 +19,16 @@ RUN mkdir -p /app \
   && chown -R nobody:nogroup /app
 WORKDIR /app
 
+#Adding  dev libdb mirrors to obtain older packahes
+RUN wget http://mirrors.kernel.org/ubuntu/pool/universe/d/db/libdb5.1_5.1.29-7ubuntu1_amd64.deb \
+    wget http://mirrors.kernel.org/ubuntu/pool/universe/d/db/libdb5.1++_5.1.29-7ubuntu1_amd64.deb \
+    dpkg -i libdb5.1*-dev*.deb
+
+# Adding old libdb mirrors
+RUN wget http://mirrors.kernel.org/ubuntu/pool/universe/d/db/libdb5.1-dev_5.1.29-7ubuntu1_amd64.deb \ 
+    wget http://mirrors.kernel.org/ubuntu/pool/universe/d/db/libdb5.1++-dev_5.1.29-7ubuntu1_amd64.deb \
+    dpkg -i libdb5.1*.deb
+
 # Source: https://github.com/bitcoin/bitcoin/blob/master/doc/build-unix.md#ubuntu--debian
 RUN apt-get update && apt-get install -y make gcc g++ build-essential libtool autotools-dev automake pkg-config libssl-dev libevent-dev bsdmainutils \
   libcurl4-openssl-dev libdb5.1-dev libdb5.1++-dev libssl-dev libtool pkg-config python python-pip libzmq3-dev libminiupnpc-dev wget
