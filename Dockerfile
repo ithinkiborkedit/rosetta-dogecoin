@@ -13,28 +13,28 @@
 # limitations under the License.
 
 # Build bitcoind
-FROM ubuntu:18.04 as bitcoind-builder
+FROM ubuntu:18.04 as dogecoind-builder
 
 RUN mkdir -p /app \
   && chown -R nobody:nogroup /app
 WORKDIR /app
 
 # Source: https://github.com/bitcoin/bitcoin/blob/master/doc/build-unix.md#ubuntu--debian
-RUN apt-get update && apt-get install -y make gcc g++ autoconf autotools-dev bsdmainutils build-essential git libboost-all-dev \
-  libcurl4-openssl-dev libdb++-dev libevent-dev libssl-dev libtool pkg-config python python-pip libzmq3-dev wget
+RUN apt-get update && apt-get install -y make gcc g++ build-essential libtool autotools-dev automake pkg-config libssl-dev libevent-dev bsdmainutils \
+  libcurl4-openssl-dev libdb5.1-dev libdb5.1++-dev libssl-dev libtool pkg-config python python-pip libzmq3-dev libminiupnpc-dev wget
 
 # VERSION: Bitcoin Core 0.20.1
-RUN git clone https://github.com/bitcoin/bitcoin \
-  && cd bitcoin \
-  && git checkout 7ff64311bee570874c4f0dfa18f518552188df08
+RUN git clone https://github.com/dogecoin/dogecoin \
+  && cd dogecoin \
+  && git checkout f80bfe9068ac1a0619d48dad0d268894d926941e
 
-RUN cd bitcoin \
+RUN cd dogecoin \
   && ./autogen.sh \
   && ./configure --disable-tests --without-miniupnpc --without-gui --with-incompatible-bdb --disable-hardening --disable-zmq --disable-bench --disable-wallet \
   && make
 
-RUN mv bitcoin/src/bitcoind /app/bitcoind \
-  && rm -rf bitcoin
+RUN mv dogecoin/src/dogecoind /app/dogecoin \
+  && rm -rf dogecoin
 
 # Build Rosetta Server Components
 FROM ubuntu:18.04 as rosetta-builder
@@ -62,7 +62,7 @@ COPY . src
 RUN cd src \
   && go build \
   && cd .. \
-  && mv src/rosetta-bitcoin /app/rosetta-bitcoin \
+  && mv src/rosetta-dogecoin /app/rosetta-dogecoin \
   && mv src/assets/* /app \
   && rm -rf src 
 
@@ -81,7 +81,7 @@ RUN mkdir -p /app \
 WORKDIR /app
 
 # Copy binary from bitcoind-builder
-COPY --from=bitcoind-builder /app/bitcoind /app/bitcoind
+COPY --from=dogecoind-builder /app/dogecoind /app/dogecoind
 
 # Copy binary from rosetta-builder
 COPY --from=rosetta-builder /app/* /app/
@@ -89,4 +89,4 @@ COPY --from=rosetta-builder /app/* /app/
 # Set permissions for everything added to /app
 RUN chmod -R 755 /app/*
 
-CMD ["/app/rosetta-bitcoin"]
+CMD ["/app/rosetta-dogecoin"]
