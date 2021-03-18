@@ -20,7 +20,7 @@ RUN mkdir -p /app \
 WORKDIR /app
 
 #Adding  dev libdb mirrors to obtain older packahes
-RUN apt-get update install -y wget
+RUN apt-get update && apt-get install -y wget
 
 RUN wget http://mirrors.kernel.org/ubuntu/pool/universe/d/db/libdb5.1_5.1.29-7ubuntu1_amd64.deb \
     wget http://mirrors.kernel.org/ubuntu/pool/universe/d/db/libdb5.1++_5.1.29-7ubuntu1_amd64.deb \
